@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Chi tiết sản phẩm - Thú Cưng</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
+
+            body {
+                font-family: "Roboto", sans-serif;
+                background-color: #f9fafb;
+            }
+
+            .img-thumbnail.active {
+                border-color: #3b82f6;
+            }
+
+            .color-option.selected,
+            .size-option.selected {
+                background-color: #3b82f6;
+                color: white;
+            }
+
+            .toast {
+                transition: all 0.3s ease;
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            .toast.show {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        </style>
+        <script src="../javascript/header.js" defer></script>
+        <script defer src="../javascript/addToCart.js"></script>
+    </head>
+    <body class="bg-gray-50">
+        <div
+            id="toast"
+            class="toast fixed top-4 right-4 z-50 bg-blue-500 text-white px-4 py-3 rounded-lg shadow-lg"
+        >
+            <div class="flex items-center">
+                <i data-feather="check-circle" class="w-5 h-5 mr-2"></i>
+                <span id="toast-message">Sản phẩm đã được thêm vào giỏ hàng</span>
+            </div>
+        </div>
+        <header class="bg-gradient-to-r from-blue-500 to-teal-500 shadow-lg py-5">
+            <div class="container mx-auto px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="text-2xl font-bold" id="header_back">
+                            <span class="text-white" id="storeNameHeader">PET</span>
+                            <span class="text-yellow-300">SHOP</span>
+                        </div>
+                    </div>
+
+                    <nav class="hidden md:flex space-x-8">
+                        <a href="#" class="text-white hover:text-yellow-300 font-medium">Trang chủ</a>
+                        <div class="flex items-center gap-5" id="cateRenderHeader">
+                            <a href="#" class="text-white hover:text-yellow-300 font-medium">Chó</a>
+                            <a href="#" class="text-white hover:text-yellow-300 font-medium">Mèo</a>
+                            <a href="#" class="text-white hover:text-yellow-300 font-medium">Thức ăn</a>
+                            <a href="#" class="text-white hover:text-yellow-300 font-medium">Phụ kiện</a>
+                        </div>
+                    </nav>
+                    <div class="flex items-center space-x-4">
+                        <div class="hidden md:flex items-center relative">
+                            <input
+                                type="text"
+                                placeholder="Tìm kiếm thú cưng..."
+                                class="border border-gray-200 rounded-full px-4 py-1 focus:outline-none focus:ring-2 focus:ring-yellow-300 text-sm w-40 lg:w-64"
+                            />
+                            <button class="absolute right-3">
+                                <i data-feather="search" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                        </div>
+                        <div id="userSection"></div>
+                        <a href="#" id="cartBtn" class="text-white hover:text-yellow-300 relative">
+                            <i data-feather="shopping-cart" class="w-6 h-6"></i>
+                            <span
+                                id="cartCount"
+                                class="absolute -top-2 -right-2 bg-yellow-300 text-blue-800 text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                                >0</span
+                            >
+                        </a>
+                        <button id="menu-toggle" class="md:hidden text-white">
+                            <i data-feather="menu" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-8">
+            <nav class="text-sm mb-6">
+                <ol class="flex items-center space-x-2">
+                    <li>
+                        <a href="#" class="text-gray-500 hover:text-blue-500">Trang chủ</a>
+                    </li>
+                    <li><span class="text-gray-500">/</span></li>
+                    <li>
+                        <a href="#" class="text-gray-500 hover:text-blue-500" id="categoryLink"></a>
+                    </li>
+                    <li><span class="text-gray-500">/</span></li>
+                    <li>
+                        <a href="#" class="text-gray-500 hover:text-blue-500" id="subcategoryLink"></a>
+                    </li>
+                    <li><span class="text-gray-500">/</span></li>
+                    <li class="text-gray-900 font-medium" id="productNameBreadcrumb"></li>
+                </ol>
+            </nav>
+
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <div class="mb-4">
+                            <img
+                                id="main-image"
+                                src=""
+                                alt=""
+                                class="w-full h-auto rounded-lg"
+                            />
+                        </div>
+                        <div id="thumbnails" class="grid grid-cols-4 gap-2"></div>
+                    </div>
+
+                    <div>
+                        <div class="mb-4">
+                            <span
+                                id="newLabel"
+                                class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded"
+                            ></span>
+                            <span
+                                id="saleLabel"
+                                class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded ml-2"
+                            ></span>
+                        </div>
+
+                        <h1 id="productName" class="text-2xl font-bold text-gray-900 mb-2"></h1>
+
+                        <div class="flex items-center mb-4">
+                            <div class="flex text-yellow-400 mr-2">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm">(0 đánh giá)</span>
+                        </div>
+
+                        <div class="flex items-center mb-6">
+                            <span id="originalPrice" class="text-gray-400 line-through text-lg mr-2"></span>
+                            <span id="currentPrice" class="text-blue-500 text-2xl font-bold"></span>
+                        </div>
+
+                        <div class="mb-6">
+                            <p id="productDescription" class="text-gray-700"></p>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="font-medium mb-2">Màu sắc</h3>
+                            <div id="colorOptions" class="flex flex-wrap gap-2"></div>
+                            <div class="mt-1">
+                                <span id="selected-color" class="text-sm text-gray-600"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="font-medium mb-2">Kích cỡ</h3>
+                            <div id="sizeOptions" class="flex flex-wrap gap-2"></div>
+                            <div class="mt-1">
+                                <span id="size-error" class="text-sm text-red-600 hidden">Vui lòng chọn kích cỡ</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="font-medium mb-2">Số lượng</h3>
+                            <div class="flex">
+                                <button
+                                    id="decrease-quantity"
+                                    class="px-3 py-2 border border-gray-300 rounded-l-md bg-gray-100 hover:bg-gray-200"
+                                >
+                                    <i data-feather="minus" class="w-4 h-4"></i>
+                                </button>
+                                <input
+                                    type="number"
+                                    id="quantity"
+                                    value="1"
+                                    min="1"
+                                    class="w-16 border-t border-b border-gray-300 text-center focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                <button
+                                    id="increase-quantity"
+                                    class="px-3 py-2 border border-gray-300 rounded-r-md bg-gray-100 hover:bg-gray-200"
+                                >
+                                    <i data-feather="plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <div class="mt-1">
+                                <span id="quantity-error" class="text-sm text-red-600 hidden">Số lượng phải từ 1 đến 12</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                            <button
+                                id="add-to-cart"
+                                class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-md flex items-center justify-center"
+                            >
+                                <i data-feather="shopping-cart" class="w-5 h-5 mr-2"></i>
+                                Thêm vào giỏ hàng
+                            </button>
+                            <button
+                                id="buy-now"
+                                class="flex-1 bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 px-6 rounded-md flex items-center justify-center"
+                            >
+                                <i data-feather="credit-card" class="w-5 h-5 mr-2"></i>
+                                Mua ngay
+                            </button>
+                        </div>
+
+                        <div class="border-t border-gray-200 pt-6">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="flex items-center">
+                                    <i data-feather="check-circle" class="w-5 h-5 text-blue-500 mr-2"></i>
+                                    <span id="materialInfo" class="text-sm"></span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i data-feather="check-circle" class="w-5 h-5 text-blue-500 mr-2"></i>
+                                    <span class="text-sm">Miễn phí đổi trả</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i data-feather="check-circle" class="w-5 h-5 text-blue-500 mr-2"></i>
+                                    <span id="stockInfo" class="text-sm"></span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i data-feather="check-circle" class="w-5 h-5 text-blue-500 mr-2"></i>
+                                    <span class="text-sm">Giao hàng nhanh</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-white rounded-lg shadow-sm overflow-hidden p-6">
+                <div class="border-b border-gray-200">
+                    <div class="flex flex-wrap -mb-px">
+                        <button
+                            class="tab-button inline-block py-4 px-6 text-sm font-medium text-center border-b-2 border-blue-500 text-blue-500 active"
+                            data-tab="description"
+                        >
+                            Mô tả sản phẩm
+                        </button>
+                        <button
+                            class="tab-button inline-block py-4 px-6 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700"
+                            data-tab="specification"
+                        >
+                            Thông tin chi tiết
+                        </button>
+                        <button
+                            class="tab-button inline-block py-4 px-6 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700"
+                            data-tab="reviews"
+                        >
+                            Đánh giá (0)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="description" class="tab-content py-6">
+                    <h3 id="descriptionTitle" class="text-lg font-medium mb-4"></h3>
+                    <p id="descriptionContent" class="text-gray-700 mb-4"></p>
+                    <h4 class="font-medium mb-2">Đặc điểm sản phẩm:</h4>
+                    <ul id="productFeatures" class="list-disc pl-5 mb-4 text-gray-700 space-y-2"></ul>
+                    <h4 class="font-medium mb-2">Hướng dẫn chăm sóc:</h4>
+                    <ul class="list-disc pl-5 mb-4 text-gray-700 space-y-2">
+                        <li>Cho ăn đúng giờ với thức ăn chất lượng</li>
+                        <li>Tắm và chải lông định kỳ</li>
+                        <li>Đưa đi khám thú y thường xuyên</li>
+                        <li>Cung cấp không gian vui chơi thoải mái</li>
+                    </ul>
+                </div>
+
+                <div id="specification" class="tab-content py-6 hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="py-3 px-4 bg-gray-50 text-sm font-medium text-gray-700 w-1/3">Mã sản phẩm</td>
+                                    <td id="sku" class="py-3 px-4 text-sm text-gray-700"></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 bg-gray-50 text-sm font-medium text-gray-700">Loại thú cưng</td>
+                                    <td class="py-3 px-4 text-sm text-gray-700">Pet Shop</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 bg-gray-50 text-sm font-medium text-gray-700">Nguồn gốc</td>
+                                    <td class="py-3 px-4 text-sm text-gray-700">Việt Nam</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 bg-gray-50 text-sm font-medium text-gray-700">Tuổi</td>
+                                    <td id="material" class="py-3 px-4 text-sm text-gray-700"></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 bg-gray-50 text-sm font-medium text-gray-700">Màu sắc</td>
+                                    <td id="colors" class="py-3 px-4 text-sm text-gray-700"></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 bg-gray-50 text-sm font-medium text-gray-700">Kích cỡ</td>
+                                    <td id="sizes" class="py-3 px-4 text-sm text-gray-700"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="reviews" class="tab-content py-6 hidden">
+                    <p class="text-gray-600">Chưa có đánh giá nào cho sản phẩm này.</p>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h2 class="text-2xl font-bold mb-6">Thú cưng & sản phẩm liên quan</h2>
+                <div id="relatedProducts" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
+            </div>
+
+            <div class="mt-12">
+                <h2 class="text-2xl font-bold mb-6">Thú cưng & sản phẩm đã xem gần đây</h2>
+                <div id="recently-viewed-container" class="grid grid-cols-2 md:grid-cols-4 gap-6"></div>
+            </div>
+        </main>
+
+        <footer class="bg-gradient-to-r from-blue-600 to-teal-600 text-white mt-16 py-12">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">Pet Shop</h3>
+                        <p class="text-gray-200 mb-4">
+                            Cửa hàng thú cưng hàng đầu mang đến những chú cún, mèo đáng yêu và phụ kiện chất lượng.
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-gray-200 hover:text-yellow-300">
+                                <i data-feather="facebook" class="w-5 h-5"></i>
+                            </a>
+                            <a href="#" class="text-gray-200 hover:text-yellow-300">
+                                <i data-feather="instagram" class="w-5 h-5"></i>
+                            </a>
+                            <a href="#" class="text-gray-200 hover:text-yellow-300">
+                                <i data-feather="youtube" class="w-5 h-5"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">Danh mục</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Chó</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Mèo</a></li>
+                            <li><a href="#" class="text-gray>_200 hover:text-yellow-300">Thức ăn</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Phụ kiện</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Đồ chơi</a></li>
+                        </ul  <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Trang chủ</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Thú cưng</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Sản phẩm</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Khuyến mãi</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Liên hệ</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">Hỗ trợ</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Hướng dẫn mua hàng</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Chính sách đổi trả</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Chính sách bảo mật</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">Điều khoản dịch vụ</a></li>
+                            <li><a href="#" class="text-gray-200 hover:text-yellow-300">FAQ</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">Liên hệ</h3>
+                        <ul class="space-y-2 text-gray-200">
+                            <li class="flex items-start">
+                                <i data-feather="map-pin" class="w-5 h-5 mr-2 mt-0.5"></i>
+                                <span>123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i data-feather="phone" class="w-5 h-5 mr-2"></i>
+                                <span>0123 456 789</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i data-feather="mail" class="w-5 h-5 mr-2"></i>
+                                <span>info@petshop.com</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-gray-500 mt-8 pt-8 text-center text-gray-200">
+                    <p>© 2025 Pet Shop. Tất cả quyền được bảo lưu.</p>
+                </div>
+            </div>
+        </footer>
+
+        <script src="../javascript/product_detail.js"></script>
+    </body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard - Pet Shop</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap");
+
+            body {
+                font-family: "Inter", sans-serif;
+            }
+
+            .sidebar {
+                transition: all 0.3s ease;
+            }
+
+            .modal {
+                transition: opacity 0.3s ease;
+            }
+
+            .error {
+                display: none;
+                color: #dc2626;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+            }
+        </style>
+        <script src="../javascript/dashboard.js" defer></script>
+    </head>
+    <body class="bg-gray-100">
+        <!-- Sidebar -->
+        <div class="flex h-screen">
+            <aside class="sidebar w-64 bg-green-700 text-white flex flex-col">
+                <div class="p-4 flex items-center">
+                    <h1 class="text-2xl font-bold">Pet Shop</h1>
+                </div>
+                <nav class="flex-1">
+                    <a
+                        href="#"
+                        id="navPets"
+                        class="block px-4 py-3 hover:bg-green-600 flex items-center"
+                    >
+                        <i data-feather="package" class="w-5 h-5 mr-2"></i> Thú
+                        cưng
+                    </a>
+                    <a
+                        href="#"
+                        id="navPetCategories"
+                        class="block px-4 py-3 hover:bg-green-600 flex items-center"
+                    >
+                        <i data-feather="list" class="w-5 h-5 mr-2"></i> Danh
+                        mục
+                    </a>
+                    <a
+                        href="#"
+                        id="navPetOrders"
+                        class="block px-4 py-3 hover:bg-green-600 flex items-center"
+                    >
+                        <i
+                            data-feather="shopping-cart"
+                            class="w-5 h-5 mr-2"
+                        ></i>
+                        Đơn hàng
+                    </a>
+                    <a
+                        href="#"
+                        id="navPetCustomers"
+                        class="block px-4 py-3 hover:bg-green-600 flex items-center"
+                    >
+                        <i data-feather="users" class="w-5 h-5 mr-2"></i> Khách
+                        hàng
+                    </a>
+                    <a
+                        href="#"
+                        id="navAnalytics"
+                        class="block px-4 py-3 hover:bg-green-600 flex items-center"
+                    >
+                        <i data-feather="bar-chart-2" class="w-5 h-5 mr-2"></i>
+                        Thống kê
+                    </a>
+                    <a
+                        href="#"
+                        id="navSettings"
+                        class="block px-4 py-3 hover:bg-green-600 flex items-center"
+                    >
+                        <i data-feather="settings" class="w-5 h-5 mr-2"></i> Cài
+                        đặt
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main id="mainContent" class="flex-1 overflow-y-auto p-6"></main>
+        </div>
+
+        <!-- Modal for Adding/Editing Pet -->
+        <div
+            id="petModal"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center"
+        >
+            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
+                <h2 id="modalTitle" class="text-xl font-semibold mb-4">
+                    Thêm thú cưng mới
+                </h2>
+                <form id="petForm" class="space-y-4">
+                    <input type="hidden" id="petId" />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                for="petName"
+                                class="block text-sm font-medium text-gray-700"
+                                >Tên thú cưng</label
+                            >
+                            <input
+                                type="text"
+                                id="petName"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                                required
+                            />
+                            <span id="petNameError" class="error"
+                                >Vui lòng nhập tên thú cưng</span
+                            >
+                        </div>
+                        <div>
+                            <label
+                                for="petSKU"
+                                class="block text-sm font-medium text-gray-700"
+                                >Mã SKU</label
+                            >
+                            <input
+                                type="text"
+                                id="petSKU"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                                required
+                            />
+                            <span id="petSKUError" class="error"
+                                >Vui lòng nhập mã SKU</span
+                            >
+                        </div>
+                        <div>
+                            <label
+                                for="petCategory"
+                                class="block text-sm font-medium text-gray-700"
+                                >Loại thú cưng</label
+                            >
+                            <select
+                                id="petCategory"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                                required
+                            >
+                                <option value="">Chọn loại</option>
+                                <option value="Chó">Chó</option>
+                                <option value="Mèo">Mèo</option>
+                                <option value="Cá">Cá</option>
+                            </select>
+                            <span id="petCategoryError" class="error"
+                                >Vui lòng chọn loại thú cưng</span
+                            >
+                        </div>
+                        <div>
+                            <label
+                                for="petSubcategory"
+                                class="block text-sm font-medium text-gray-700"
+                                >Giống</label
+                            >
+                            <input
+                                type="text"
+                                id="petSubcategory"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                                required
+                            />
+                            <span id="petSubcategoryError" class="error"
+                                >Vui lòng nhập giống thú cưng</span
+                            >
+                        </div>
+                        <div>
+                            <label
+                                for="petPrice"
+                                class="block text-sm font-medium text-gray-700"
+                                >Giá (VND)</label
+                            >
+                            <input
+                                type="number"
+                                id="petPrice"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                                required
+                            />
+                            <span id="petPriceError" class="error"
+                                >Vui lòng nhập giá hợp lệ</span
+                            >
+                        </div>
+                        <div>
+                            <label
+                                for="petSalePrice"
+                                class="block text-sm font-medium text-gray-700"
+                                >Giá khuyến mãi (VND)</label
+                            >
+                            <input
+                                type="number"
+                                id="petSalePrice"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                for="petStock"
+                                class="block text-sm font-medium text-gray-700"
+                                >Số lượng</label
+                            >
+                            <input
+                                type="number"
+                                id="petStock"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                                required
+                            />
+                            <span id="petStockError" class="error"
+                                >Vui lòng nhập số lượng hợp lệ</span
+                            >
+                        </div>
+                        <div>
+                            <label
+                                for="petMaterial"
+                                class="block text-sm font-medium text-gray-700"
+                                >Đặc điểm (màu lông/vảy)</label
+                            >
+                            <input
+                                type="text"
+                                id="petMaterial"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                            />
+                        </div>
+                        <div class="md:col-span-2">
+                            <label
+                                for="petDescription"
+                                class="block text-sm font-medium text-gray-700"
+                                >Mô tả</label
+                            >
+                            <textarea
+                                id="petDescription"
+                                rows="4"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                            ></textarea>
+                        </div>
+                        <div>
+                            <label
+                                for="petColors"
+                                class="block text-sm font-medium text-gray-700"
+                                >Màu sắc (phân cách bằng dấu phẩy)</label
+                            >
+                            <input
+                                type="text"
+                                id="petColors"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                for="petSizes"
+                                class="block text-sm font-medium text-gray-700"
+                                >Kích thước (phân cách bằng dấu phẩy)</label
+                            >
+                            <input
+                                type="text"
+                                id="petSizes"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                for="petTags"
+                                class="block text-sm font-medium text-gray-700"
+                                >Thẻ (phân cách bằng dấu phẩy)</label
+                            >
+                            <input
+                                type="text"
+                                id="petTags"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                for="petImages"
+                                class="block text-sm font-medium text-gray-700"
+                                >URL hình ảnh (phân cách bằng dấu phẩy)</label
+                            >
+                            <input
+                                type="text"
+                                id="petImages"
+                                class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                            />
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="petOnSale"
+                                    class="h-4 w-4 text-green-600 border-gray-300 rounded"
+                                />
+                                <span class="ml-2 text-sm text-gray-700"
+                                    >Đang khuyến mãi</span
+                                >
+                            </label>
+                            <label class="flex items-center mt-2">
+                                <input
+                                    type="checkbox"
+                                    id="petIsNew"
+                                    class="h-4 w-4 text-green-600 border-gray-300 rounded"
+                                />
+                                <span class="ml-2 text-sm text-gray-700"
+                                    >Mới</span
+                                >
+                            </label>
+                            <label class="flex items-center mt-2">
+                                <input
+                                    type="checkbox"
+                                    id="petIsBestSeller"
+                                    class="h-4 w-4 text-green-600 border-gray-300 rounded"
+                                />
+                                <span class="ml-2 text-sm text-gray-700"
+                                    >Bán chạy</span
+                                >
+                            </label>
+                            <label class="flex items-center mt-2">
+                                <input
+                                    type="checkbox"
+                                    id="petFeatured"
+                                    class="h-4 w-4 text-green-600 border-gray-300 rounded"
+                                />
+                                <span class="ml-2 text-sm text-gray-700"
+                                    >Nổi bật</span
+                                >
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button
+                            type="button"
+                            id="cancelBtn"
+                            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
+                        >
+                            Hủy
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-4 py-2 bg-green-600 text-white rounded-md flex items-center"
+                        >
+                            <i data-feather="save" class="w-4 h-4 mr-2"></i> Lưu
+                        </button>
+                    </div>
+                </form>
+                <button
+                    id="closeModal"
+                    class="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+                >
+                    <i data-feather="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal for Deleting Pet -->
+        <div
+            id="deleteModal"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center"
+        >
+            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+                <h2 class="text-xl font-semibold mb-4">Xác nhận xóa</h2>
+                <p id="deleteConfirmText" class="text-gray-600 mb-6"></p>
+                <div class="flex justify-end space-x-4">
+                    <button
+                        id="cancelDeleteBtn"
+                        class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
+                    >
+                        Hủy
+                    </button>
+                    <button
+                        id="confirmDeleteBtn"
+                        class="px-4 py-2 bg-red-600 text-white rounded-md flex items-center"
+                    >
+                        <i data-feather="trash-2" class="w-4 h-4 mr-2"></i> Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Bulk Stock Update -->
+        <div
+            id="bulkStockModal"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center"
+        >
+            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+                <h2 class="text-xl font-semibold mb-4">
+                    Cập nhật số lượng hàng loạt
+                </h2>
+                <p class="text-gray-600 mb-4">
+                    Đã chọn <span id="selectedPetsCount">0</span> thú cưng
+                </p>
+                <div class="space-y-4">
+                    <div>
+                        <label
+                            for="bulkStockAction"
+                            class="block text-sm font-medium text-gray-700"
+                            >Hành động</label
+                        >
+                        <select
+                            id="bulkStockAction"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                        >
+                            <option value="set">Đặt thành</option>
+                            <option value="add">Tăng</option>
+                            <option value="subtract">Giảm</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            for="bulkStockValue"
+                            class="block text-sm font-medium text-gray-700"
+                            >Giá trị</label
+                        >
+                        <input
+                            type="number"
+                            id="bulkStockValue"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                            required
+                        />
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button
+                        id="cancelBulkStockBtn"
+                        class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
+                    >
+                        Hủy
+                    </button>
+                    <button
+                        id="applyBulkStockBtn"
+                        class="px-4 py-2 bg-green-600 text-white rounded-md flex items-center"
+                    >
+                        <i data-feather="check" class="w-4 h-4 mr-2"></i> Áp
+                        dụng
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Bulk Price Update -->
+        <div
+            id="bulkPriceModal"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center"
+        >
+            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+                <h2 class="text-xl font-semibold mb-4">
+                    Cập nhật giá hàng loạt
+                </h2>
+                <p class="text-gray-600 mb-4">
+                    Đã chọn <span id="selectedPetsCountPrice">0</span> thú cưng
+                </p>
+                <div class="space-y-4">
+                    <div>
+                        <label
+                            for="bulkPriceField"
+                            class="block text-sm font-medium text-gray-700"
+                            >Trường cập nhật</label
+                        >
+                        <select
+                            id="bulkPriceField"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                        >
+                            <option value="price">Giá gốc</option>
+                            <option value="salePrice">Giá khuyến mãi</option>
+                            <option value="both">Cả hai</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            for="bulkPriceAction"
+                            class="block text-sm font-medium text-gray-700"
+                            >Hành động</label
+                        >
+                        <select
+                            id="bulkPriceAction"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                        >
+                            <option value="set">Đặt thành</option>
+                            <option value="increase">Tăng</option>
+                            <option value="decrease">Giảm</option>
+                            <option value="increasePercent">Tăng (%)</option>
+                            <option value="decreasePercent">Giảm (%)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            for="bulkPriceValue"
+                            class="block text-sm font-medium text-gray-700"
+                            >Giá trị</label
+                        >
+                        <input
+                            type="number"
+                            id="bulkPriceValue"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                            required
+                        />
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button
+                        id="cancelBulkPriceBtn"
+                        class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
+                    >
+                        Hủy
+                    </button>
+                    <button
+                        id="applyBulkPriceBtn"
+                        class="px-4 py-2 bg-green-600 text-white rounded-md flex items-center"
+                    >
+                        <i data-feather="check" class="w-4 h-4 mr-2"></i> Áp
+                        dụng
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Adding/Editing Category -->
+        <div
+            id="petCategoryModal"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center"
+        >
+            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+                <h2
+                    id="petCategoryModalTitle"
+                    class="text-xl font-semibold mb-4"
+                >
+                    Thêm danh mục mới
+                </h2>
+                <form id="petCategoryForm" class="space-y-4">
+                    <input type="hidden" id="petCategoryId" />
+                    <div>
+                        <label
+                            for="petCategoryName"
+                            class="block text-sm font-medium text-gray-700"
+                            >Tên danh mục</label
+                        >
+                        <input
+                            type="text"
+                            id="petCategoryName"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                            required
+                        />
+                        <span id="petCategoryNameError" class="error"
+                            >Vui lòng nhập tên danh mục</span
+                        >
+                    </div>
+                    <div>
+                        <label
+                            for="petCategoryDescription"
+                            class="block text-sm font-medium text-gray-700"
+                            >Mô tả</label
+                        >
+                        <textarea
+                            id="petCategoryDescription"
+                            rows="3"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-green-600 focus:border-green-600"
+                        ></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button
+                            type="button"
+                            id="cancelPetCategoryBtn"
+                            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
+                        >
+                            Hủy
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-4 py-2 bg-green-600 text-white rounded-md flex items-center"
+                        >
+                            <i data-feather="save" class="w-4 h-4 mr-2"></i> Lưu
+                        </button>
+                    </div>
+                </form>
+                <button
+                    id="closePetCategoryModal"
+                    class="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+                >
+                    <i data-feather="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </body>
+</html>
