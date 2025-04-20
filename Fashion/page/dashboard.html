@@ -10,13 +10,16 @@
         />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+        <script src="../javascript/sampleData.js"></script>
     </head>
 
     <body class="bg-gray-100 min-h-screen">
         <div class="flex h-screen">
             <div class="w-64 bg-gray-800 text-white">
                 <div class="p-4">
-                    <h1 class="text-xl font-bold">Fashion Admin</h1>
+                    <h1 class="text-xl font-bold">
+                        <a href="index.html">Fashion Admin</a>
+                    </h1>
                 </div>
                 <nav class="mt-6">
                     <a
@@ -72,6 +75,14 @@
                             ><i data-feather="settings"></i
                         ></span>
                         Cài đặt
+                    </a>
+                    <a
+                        href="#"
+                        onclick="handleLogOutDashBoard()"
+                        class="block py-3 px-4 text-gray-300 hover:bg-gray-700 flex items-center"
+                    >
+                        <span class="mr-2"><i data-feather="log-out"></i></span>
+                        Đăng xuất
                     </a>
                 </nav>
             </div>

@@ -72,7 +72,3 @@ window.viewProductDetail = function (id) {
         alert("Sản phẩm không tồn tại!");
     }
 };
-
-document.getElementById("closeProductDetail").addEventListener("click", () => {
-    document.getElementById("productDetailModal").classList.add("hidden");
-});
