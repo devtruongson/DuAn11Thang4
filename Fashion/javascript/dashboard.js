@@ -655,6 +655,8 @@ document.querySelectorAll("nav a").forEach((link) => {
         currentPage = 1;
         if (contentId === "navProducts") {
             renderProducts(getCurrentPageItems(products));
+            handledumpCate();
+            handleDumpCateModal();
             setupProductEventListeners();
         }
         if (contentId === "navCategories")
@@ -896,3 +898,32 @@ function setupSettingsEventListeners() {
 }
 
 document.getElementById("navProducts").click();
+function handledumpCate() {
+    const selectFiter = document.querySelector("#categoryFilter");
+    if (selectFiter) {
+        const cates = JSON.parse(localStorage.getItem("categories")) || [];
+        const htmlCate = [
+            `<option value="">Tất cả</option>`,
+            ...cates.map(
+                (item) => `<option value="${item.name}">${item.name}</option>`
+            ),
+        ].join("");
+        selectFiter.innerHTML = htmlCate;
+    }
+}
+
+function handleDumpCateModal() {
+    const productCategoryModal = document.querySelector("#productCategory");
+    if (productCategoryModal) {
+        const cates = JSON.parse(localStorage.getItem("categories")) || [];
+        const htmlCate = [
+            ...cates.map(
+                (item) => `<option value="${item.name}">${item.name}</option>`
+            ),
+        ].join("");
+        productCategoryModal.innerHTML = htmlCate;
+    }
+}
+
+handleDumpCateModal();
+handledumpCate();

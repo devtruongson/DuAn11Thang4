@@ -443,33 +443,6 @@ function initializeStorage() {
     // Đảm bảo sản phẩm được lưu vào localStorage
     const products = JSON.parse(localStorage.getItem("products")) || [];
     const productExists = products.some((p) => p.id === 1744899474067);
-    if (!productExists) {
-        products.push({
-            id: 1744899474067,
-            name: "Chân Váy Xếp Ly Dài Ngàng Gối Cho Nàng Công Sở",
-            category: "Nữ",
-            subcategory: "Thời Trang",
-            sku: "TR01",
-            price: 13344,
-            salePrice: 3432,
-            stock: 12,
-            material: "Cotton",
-            description:
-                "Là con gái, chắc hẳn chân váy là thứ mà các bạn đều có trong tủ đồ. Chân váy mặc rất thoải mái, phù hợp nhiều dịp và còn rất nữ tính. Tất nhiên, các nàng công sở cũng không ngoại lệ. Mốt chiếc váy điệu đà thay cho quần tây cũng là ý hay. Như vậy là bạn có thể F5 cho bản thân mà chẳng cần làm gì cầu kỳ. Hiện nay, những chiếc chân váy xếp ly dài đang rất được yêu thích. Nó có gì mà lại thu hút các tín đồ thời trang như vậy? Bài viết dưới đây sẽ cũng cấp một số thông tin cần thiết dành cho bạn",
-            colors: ["Đỏ", "Xanh", "Đen"],
-            sizes: ["xs", "xl", "xxl"],
-            tags: ["áo thun", "nam", "hè"],
-            onSale: false,
-            isNew: true,
-            isBestSeller: false,
-            featured: false,
-            images: [
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-6n9E30wUvDJHxDPiYSnmlArYOzg5Nb4EIQ&s",
-                "https://pos.nvncdn.com/fa49eb-41931/ps/20211225_95FQua31FsPjOmeBHiwBhWCw.jpg",
-            ],
-        });
-        localStorage.setItem("products", JSON.stringify(products));
-    }
 }
 
 // Thêm sản phẩm vào giỏ hàng

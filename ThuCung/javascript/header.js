@@ -1,15 +1,9 @@
 const cates = JSON.parse(localStorage.getItem("categories")) || [];
 const htmlCate = cates.map(
     (item) => `<a
-                        href="#"
+                        href="categories.html?id=${item.id}"
                         class="text-gray-800 hover:text-purple-600 font-medium"
                         >${item.name}</a>`
-);
-htmlCate.push(
-    `<a
-        href="dashboard.html"
-        class="text-gray-800 hover:text-purple-600 font-medium"
-        >Trang Quản Trị</a>`
 );
 
 const cateWpRender = (document.querySelector("#cateRenderHeader").innerHTML =
